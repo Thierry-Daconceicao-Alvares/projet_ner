@@ -1,0 +1,109 @@
+name: CI/CD — API NER TASS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  tests:
+    name: Lint, tests et garde-fou qualité du modèle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Installer les dépendances
+        run: pip install -r requirements-dev.txt
+      - name: Lint (ruff)
+        run: ruff check api tests scripts
+      - name: Tests API + qualité du modèle (F1 >= 0.70)
+        run: pytest -v -s
+
+  integration:
+    name: Intégration avec Elasticsearch
+    runs-on: ubuntu-latest
+    needs: tests
+    services:
+      elasticsearch:
+        image: elasticsearch:8.11.0
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: "false"
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
+        ports:
+          - 9200:9200
+        options: >-
+          --health-cmd "curl -s http://localhost:9200 | grep -q cluster_name"
+          --health-interval 10s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements-api.txt
+      - name: Démarrer l'API reliée à Elasticsearch
+        env:
+          ES_URL: http://localhost:9200
+        run: |
+          nohup uvicorn api.main:app --port 8000 > api.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf localhost:8000/health && break; sleep 2; done
+      - name: Indexer 50 articles via l'API
+        run: |
+          python - <<'EOF'
+          import json, urllib.request
+          arts = json.load(open("data/sample_articles.json"))
+          for a in arts:
+              req = urllib.request.Request("http://localhost:8000/index",
+                  data=json.dumps({"id": str(a["id"]), "text": a["text"], "date": a["date"]}).encode(),
+                  headers={"Content-Type": "application/json"})
+              urllib.request.urlopen(req).read()
+          print(len(arts), "articles indexés")
+          EOF
+      - name: Vérifier l'index et une agrégation
+        run: |
+          curl -s -X POST localhost:9200/tass_ner_v2/_refresh
+          COUNT=$(curl -s localhost:9200/tass_ner_v2/_count | python -c "import sys,json;print(json.load(sys.stdin)['count'])")
+          echo "Documents indexés : $COUNT"
+          test "$COUNT" -ge 50
+          curl -s -X POST localhost:9200/tass_ner_v2/_search -H 'Content-Type: application/json' \
+            -d '{"size":0,"aggs":{"top_armes":{"terms":{"field":"weapons.keyword","size":5}}}}' | python -m json.tool
+      - name: Journal de l'API
+        if: always()
+        run: cat api.log
+
+  docker:
+    name: Build et publication de l'image (CD)
+    runs-on: ubuntu-latest
+    needs: [tests, integration]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Nom de l'image en minuscules
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/ner-tass-api" >> $GITHUB_ENV
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+      - name: Test de fumée de l'image publiée
+        run: |
+          docker run -d --name api -p 8000:8000 ${{ env.IMAGE }}:${{ github.sha }}
+          for i in $(seq 1 30); do curl -sf localhost:8000/health && break; sleep 2; done
+          curl -sf -X POST localhost:8000/predict -H 'Content-Type: application/json' \
+            -d '{"text":"The Russian Defense Ministry said a HIMARS rocket was shot down."}'

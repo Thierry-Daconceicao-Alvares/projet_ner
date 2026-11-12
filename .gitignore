@@ -1,0 +1,17 @@
+# Données volumineuses (non versionnées) — à placer à la racine pour rejouer le pipeline
+data_set.json
+texts_clean.json
+annotations.json
+annotated_ids.json
+dataset_with_entities.json
+extracted_entities.jsonl
+/train.spacy
+/dev.spacy
+*.log
+!reports/*.log
+# Environnements et caches
+venv/
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/

@@ -1,13 +1,13 @@
-# Docker Compose pour Elasticsearch + Kibana
-# ============================================
-# Démarrage: docker-compose up -d
-# Arrêt:     docker-compose down
-# Logs:      docker-compose logs -f
+# Docker Compose : Elasticsearch + Kibana + API NER + Prometheus
+# ===============================================================
+# Démarrage : docker compose up -d
+# Arrêt     : docker compose down
+# Logs      : docker compose logs -f
 #
-# Elasticsearch: http://localhost:9200
-# Kibana:        http://localhost:5601
-
-version: '3.8'
+# Elasticsearch : http://localhost:9200
+# Kibana        : http://localhost:5601
+# API NER       : http://localhost:8000/docs
+# Prometheus    : http://localhost:9090
 
 services:
   elasticsearch:
@@ -42,6 +42,34 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
+
+  api:
+    build: .
+    image: ner-tass-api:local
+    container_name: ner_api
+    environment:
+      - ES_URL=http://elasticsearch:9200
+      - ES_INDEX=tass_ner_v2
+    ports:
+      - "8000:8000"
+    networks:
+      - elastic
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: prometheus_ner
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - elastic
+    depends_on:
+      - api
 
 networks:
   elastic:

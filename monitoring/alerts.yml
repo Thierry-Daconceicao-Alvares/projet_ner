@@ -1,0 +1,25 @@
+# Règles d'alerte du service NER
+groups:
+  - name: ner_api
+    rules:
+      - alert: ApiIndisponible
+        expr: up{job="ner_api"} == 0
+        for: 1m
+        labels: {severity: critique}
+        annotations:
+          summary: "L'API NER ne répond plus"
+
+      - alert: LatenceElevee
+        expr: histogram_quantile(0.95, sum(rate(ner_api_request_latency_seconds_bucket{endpoint="/predict"}[5m])) by (le)) > 1
+        for: 5m
+        labels: {severity: avertissement}
+        annotations:
+          summary: "95 % des prédictions prennent plus d'une seconde"
+
+      - alert: DeriveCouverture
+        # Référence : 87,1 % des articles contiennent au moins une entité (13 % sans entité)
+        expr: rate(ner_articles_without_entity_total[30m]) / rate(ner_articles_total[30m]) > 0.25
+        for: 15m
+        labels: {severity: avertissement}
+        annotations:
+          summary: "Plus de 25 % d'articles sans entité : le contenu des articles a peut-être changé"

@@ -1,0 +1,9 @@
+.git
+venv
+data_set.json
+texts_clean.json
+dataset_with_entities.json
+extracted_entities.jsonl
+output/model-last
+*.log
+__pycache__

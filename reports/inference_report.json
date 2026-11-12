@@ -1,0 +1,52 @@
+{
+  "articles_traités": 21465,
+  "entités_extraites": 61397,
+  "filtrées": 4,
+  "distribution": {
+    "WEAPON": 17274,
+    "MIL_ORG": 44116,
+    "FAC": 2,
+    "MIL_UNIT": 3,
+    "PERCENT": 1,
+    "MONEY": 1
+  },
+  "top_10_par_label": {
+    "WEAPON": {
+      "cruise missiles": 1022,
+      "Kalibr": 726,
+      "S-400": 667,
+      "ballistic missiles": 665,
+      "ballistic missile": 554,
+      "anti-aircraft missile": 508,
+      "air defense missile": 455,
+      "HIMARS": 376,
+      "multiple rocket launchers": 365,
+      "cruise missile": 353
+    },
+    "MIL_ORG": {
+      "the Russian Defense Ministry": 2588,
+      "Defense": 2258,
+      "NATO": 1854,
+      "Defense Ministry": 1677,
+      "the Defense Ministry": 1393,
+      "Russian military": 1347,
+      "Russian forces": 1142,
+      "Russian troops": 976,
+      "Navy": 933,
+      "the Russian Armed Forces": 897
+    },
+    "FAC": {
+      "72nd mechanized": 2
+    },
+    "MIL_UNIT": {
+      "5th assault brigade": 2,
+      "5th assault corps": 1
+    },
+    "PERCENT": {
+      "71.6%": 1
+    },
+    "MONEY": {
+      "1.67 trillion rubles": 1
+    }
+  }
+}

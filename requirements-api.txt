@@ -1,0 +1,5 @@
+spacy>=3.8,<3.9
+fastapi>=0.115
+uvicorn[standard]>=0.30
+prometheus-client>=0.20
+elasticsearch==8.11.0

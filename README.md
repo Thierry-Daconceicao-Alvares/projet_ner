@@ -16,6 +16,7 @@ Pipeline complet de **Reconnaissance d'Entités Nommées (NER)** appliqué à l'
 - [Résultats & Métriques](#-résultats--métriques)
 - [Dashboard Kibana](#-dashboard-kibana)
 - [Limites & Améliorations](#-limites--améliorations-possibles)
+- [Déploiement : API, CI/CD et monitoring (prolongement — novembre 2026)](#-déploiement--api-cicd-et-monitoring-prolongement--novembre-2026)
 - [Structure des fichiers](#-structure-des-fichiers)
 - [Équipe](#-équipe)
 
@@ -211,6 +212,136 @@ Le dashboard final regroupe :
 - Ajouter une étape de normalisation/résolution de coréférence
 - Étendre le corpus à d'autres sources médiatiques pour comparer les narratifs
 - Automatiser le pipeline complet (orchestration via Airflow ou équivalent)
+
+---
+
+## 🚀 Déploiement : API, CI/CD et monitoring (prolongement — novembre 2026)
+
+> **Ce dépôt est un fork** du projet de groupe [`meriemdhiab/projet_ner`](https://github.com/meriemdhiab/projet_ner) (livré en juillet 2026).
+> Les sections précédentes décrivent ce livrable d'origine, laissé tel quel.
+> Cette section décrit le **prolongement réalisé par Thierry Alvares en novembre 2026** pour le bloc « AI Deployment » de la certification RNCP 36129 : mise à disposition du modèle sous forme de service, intégration et livraison continues, supervision en production.
+
+### Pourquoi ce prolongement
+
+Le livrable de juillet produit un modèle et un dashboard à partir d'un traitement ponctuel du corpus. Pour qu'un analyste OSINT puisse l'utiliser au quotidien, il manquait trois briques :
+
+1. **Une API** pour analyser un nouvel article à la demande et l'ajouter à l'index, sans relancer le pipeline.
+2. **Une chaîne CI/CD** qui vérifie le code et la qualité du modèle à chaque modification, puis publie une image Docker prête à déployer.
+3. **Du monitoring** pour savoir si le service répond, s'il est rapide et si le contenu analysé dérive.
+
+### Architecture
+
+```mermaid
+flowchart LR
+    subgraph Entrainement["Pipeline (étapes 1 à 7)"]
+        A[data_set.json<br/>21 742 articles] --> B[step1-3<br/>nettoyage, annotation, split]
+        B --> C[step4<br/>fine-tuning spaCy]
+        C --> M[(output/model-best)]
+    end
+    subgraph CI["GitHub Actions"]
+        T1[ruff + pytest<br/>F1 ≥ 0,70] --> T2[intégration<br/>Elasticsearch 8.11]
+        T2 --> T3[build + push<br/>ghcr.io]
+    end
+    M --> API
+    T3 -. image Docker .-> API
+    U[Analyste / client HTTP] -->|POST /predict<br/>POST /index| API[API FastAPI<br/>ner-tass-api]
+    API -->|documents enrichis| ES[(Elasticsearch<br/>tass_ner_v2)]
+    ES --> K[Kibana<br/>dashboard]
+    API -->|/metrics| P[Prometheus<br/>+ règles d'alerte]
+```
+
+### Réentraînement du modèle (12/11/2026)
+
+Le pipeline a été rejoué de bout en bout sur le corpus d'origine (étapes 1 à 6) avant d'emballer le modèle dans l'API.
+
+| Mesure (jeu dev, 41 articles) | Modèle de juillet | Modèle réentraîné |
+|---|---|---|
+| F1 global | 0,794 | **0,804** (P 0,819 · R 0,789) |
+| `MIL_ORG` | 0,852 | **0,860** |
+| `WEAPON` | 0,667 | **0,674** |
+| `MIL_UNIT` | 0,000 | 0,000 (27 exemples annotés seulement) |
+
+Inférence sur le corpus complet : 21 742 articles, ≈ 62 500 entités, **86,6 %** des articles avec au moins une entité (87,1 % en juillet). Les co-occurrences principales sont identiques (`Kalibr × Russian Navy` 258, `S-400 × NATO` 244). Les rapports bruts sont dans [`reports/`](reports/).
+
+### API d'inférence (`api/main.py`)
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET | `/health` | État du service, labels, connexion Elasticsearch |
+| GET | `/model/info` | Pipeline spaCy, précision, rappel et F1 (global et par label) |
+| POST | `/predict` | Entités d'un article (texte, offsets, comptes) |
+| POST | `/predict/batch` | Jusqu'à 100 articles en une requête |
+| POST | `/index` | Analyse puis indexe l'article dans `tass_ner_v2` (503 si Elasticsearch absent) |
+| GET | `/metrics` | Métriques Prometheus |
+| GET | `/docs` | Documentation interactive (Swagger UI servi localement) |
+
+```bash
+pip install -r requirements-api.txt
+uvicorn api.main:app --port 8000
+
+curl -X POST localhost:8000/predict -H 'Content-Type: application/json' \
+  -d '{"text": "The Russian Defense Ministry said S-400 systems shot down a HIMARS rocket."}'
+```
+
+Variables d'environnement : `MODEL_PATH` (défaut `output/model-best`), `ES_URL`, `ES_INDEX` (défaut `tass_ner_v2`), `MAX_CHARS`, `API_VERSION`.
+
+### Lancer toute la pile avec Docker
+
+```bash
+docker compose up -d --build
+```
+
+| Service | URL |
+|---|---|
+| API NER | http://localhost:8000/docs |
+| Elasticsearch | http://localhost:9200 |
+| Kibana | http://localhost:5601 |
+| Prometheus | http://localhost:9090 |
+
+L'image publiée par la CI peut aussi être lancée seule :
+
+```bash
+docker run -p 8000:8000 ghcr.io/thierry-daconceicao-alvares/ner-tass-api:latest
+```
+
+### CI/CD (`.github/workflows/ci.yml`)
+
+| Job | Déclencheur | Contenu |
+|---|---|---|
+| `tests` | push, pull request | `ruff` (lint) puis `pytest` : 7 tests d'API et un **garde-fou qualité** qui bloque la livraison si le F1 du modèle sur `data/dev.spacy` passe sous 0,70 |
+| `integration` | après `tests` | Elasticsearch 8.11 en service, indexation de 50 articles réels via `POST /index`, vérification du compte et d'une agrégation sur les armes |
+| `docker` | push sur `main` | Build et publication de l'image sur GitHub Container Registry (`latest` + SHA du commit), puis test de fumée de l'image |
+
+### Monitoring (`monitoring/`)
+
+Métriques exposées par l'API : requêtes par route et statut, latence (histogramme), entités détectées par label, articles traités, articles sans entité, taille des articles, F1 du modèle servi.
+
+| Alerte | Condition | Sens |
+|---|---|---|
+| `ApiIndisponible` | cible Prometheus injoignable pendant 1 min | le service est tombé |
+| `LatenceElevee` | p95 de `/predict` > 1 s pendant 5 min | le service ralentit |
+| `DeriveCouverture` | plus de 25 % d'articles sans entité sur 30 min | le contenu reçu ne ressemble plus au corpus d'entraînement (référence : ≈ 13 %) |
+
+Pour simuler un flux d'articles et observer les tableaux Prometheus :
+
+```bash
+python scripts/replay_traffic.py --api http://localhost:8000 --corpus texts_clean.json --n 1000 --rate 20
+```
+
+### Rejouer le pipeline (noms réels des scripts)
+
+```bash
+pip install -r requirements.txt
+python step1_extract_clean.py
+python step2_spacy_annotate.py
+python step3_convert_split.py
+python step4_train_model.py
+python step5_inference.py
+python step6_data_merged.py
+python step7_elasticsearch.py
+```
+
+Les fichiers de données volumineux (`data_set.json`, `dataset_with_entities.json`, etc.) ne sont pas versionnés (voir `.gitignore`).
 
 ---
 

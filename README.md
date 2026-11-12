@@ -16,7 +16,7 @@ Pipeline complet de **Reconnaissance d'Entités Nommées (NER)** appliqué à l'
 - [Résultats & Métriques](#-résultats--métriques)
 - [Dashboard Kibana](#-dashboard-kibana)
 - [Limites & Améliorations](#-limites--améliorations-possibles)
-- [Déploiement : API, CI/CD et monitoring (prolongement — novembre 2026)](#-déploiement--api-cicd-et-monitoring-prolongement--novembre-2026)
+- [Déploiement : API, CI/CD et monitoring](#-déploiement--api-cicd-et-monitoring)
 - [Structure des fichiers](#-structure-des-fichiers)
 - [Équipe](#-équipe)
 
@@ -215,15 +215,13 @@ Le dashboard final regroupe :
 
 ---
 
-## 🚀 Déploiement : API, CI/CD et monitoring (prolongement — novembre 2026)
+## 🚀 Déploiement : API, CI/CD et monitoring
 
-> **Ce dépôt est un fork** du projet de groupe [`meriemdhiab/projet_ner`](https://github.com/meriemdhiab/projet_ner) (livré en juillet 2026).
-> Les sections précédentes décrivent ce livrable d'origine, laissé tel quel.
-> Cette section décrit le **prolongement réalisé par Thierry Alvares en novembre 2026** pour le bloc « AI Deployment » de la certification RNCP 36129 : mise à disposition du modèle sous forme de service, intégration et livraison continues, supervision en production.
+Le modèle et le dashboard sont mis à disposition sous forme de service, avec intégration et livraison continues et une supervision en production.
 
-### Pourquoi ce prolongement
+### Pourquoi
 
-Le livrable de juillet produit un modèle et un dashboard à partir d'un traitement ponctuel du corpus. Pour qu'un analyste OSINT puisse l'utiliser au quotidien, il manquait trois briques :
+Le pipeline produit un modèle et un dashboard à partir d'un traitement du corpus. Pour qu'un analyste OSINT puisse l'utiliser au quotidien, trois briques complètent le pipeline :
 
 1. **Une API** pour analyser un nouvel article à la demande et l'ajouter à l'index, sans relancer le pipeline.
 2. **Une chaîne CI/CD** qui vérifie le code et la qualité du modèle à chaque modification, puis publie une image Docker prête à déployer.
@@ -250,18 +248,18 @@ flowchart LR
     API -->|/metrics| P[Prometheus<br/>+ règles d'alerte]
 ```
 
-### Réentraînement du modèle (12/11/2026)
+### Stabilité du modèle
 
-Le pipeline a été rejoué de bout en bout sur le corpus d'origine (étapes 1 à 6) avant d'emballer le modèle dans l'API.
+Le pipeline a été exécuté deux fois de bout en bout (étapes 1 à 6) ; le modèle servi par l'API est celui du second entraînement.
 
-| Mesure (jeu dev, 41 articles) | Modèle de juillet | Modèle réentraîné |
+| Mesure (jeu dev, 41 articles) | 1er entraînement | 2e entraînement (modèle servi) |
 |---|---|---|
 | F1 global | 0,794 | **0,804** (P 0,819 · R 0,789) |
 | `MIL_ORG` | 0,852 | **0,860** |
 | `WEAPON` | 0,667 | **0,674** |
 | `MIL_UNIT` | 0,000 | 0,000 (27 exemples annotés seulement) |
 
-Inférence sur le corpus complet : 21 742 articles, ≈ 62 500 entités, **86,6 %** des articles avec au moins une entité (87,1 % en juillet). Les co-occurrences principales sont identiques (`Kalibr × Russian Navy` 258, `S-400 × NATO` 244). Les rapports bruts sont dans [`reports/`](reports/).
+Inférence sur le corpus complet : 21 742 articles, ≈ 62 500 entités, **86,6 %** des articles avec au moins une entité (87,1 % lors de la première exécution). Les co-occurrences principales sont identiques (`Kalibr × Russian Navy` 258, `S-400 × NATO` 244). Les rapports bruts sont dans [`reports/`](reports/).
 
 ### API d'inférence (`api/main.py`)
 
@@ -328,7 +326,7 @@ Pour simuler un flux d'articles et observer les tableaux Prometheus :
 python scripts/replay_traffic.py --api http://localhost:8000 --corpus texts_clean.json --n 1000 --rate 20
 ```
 
-### Captures (exécution du 12/11/2026)
+### Captures
 
 | API (Swagger) | CI/CD (run GitHub Actions 43297927533) |
 |---|---|

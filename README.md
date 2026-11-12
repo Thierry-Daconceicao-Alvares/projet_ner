@@ -328,6 +328,16 @@ Pour simuler un flux d'articles et observer les tableaux Prometheus :
 python scripts/replay_traffic.py --api http://localhost:8000 --corpus texts_clean.json --n 1000 --rate 20
 ```
 
+### Captures (exécution du 12/11/2026)
+
+| API (Swagger) | CI/CD (run GitHub Actions 43297927533) |
+|---|---|
+| ![Swagger](docs/img/api_swagger.png) | ![CI/CD](docs/img/cicd_run.png) |
+
+| Latence p95 de `/predict` (Prometheus) | Part d'articles sans entité (Prometheus) |
+|---|---|
+| ![Latence p95](docs/img/monitoring_latence_p95.png) | ![Sans entité](docs/img/monitoring_sans_entite.png) |
+
 ### Rejouer le pipeline (noms réels des scripts)
 
 ```bash

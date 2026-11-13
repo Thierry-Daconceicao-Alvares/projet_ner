@@ -351,4 +351,4 @@ projet_ner/
 
 ---
 
-*Projet réalisé dans le cadre du cursus MSc — Data Pipelines for AI / OSINT NER, 2025-2026.*
+*Projet réalisé dans le cadre du cursus MSc — AI Deployment / OSINT NER, 2025-2026.*

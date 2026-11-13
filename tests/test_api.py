@@ -1,4 +1,4 @@
-"""Tests de l'API d'inférence (exécutés par la CI à chaque push)."""
+"""Tests de l'API d'inférence (lancés par la CI à chaque push sur main et à chaque pull request)."""
 from fastapi.testclient import TestClient
 
 from api.main import app

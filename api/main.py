@@ -3,13 +3,14 @@ API d'inférence NER — OSINT TASS
 ================================
 Expose le modèle spaCy fine-tuné (WEAPON / MIL_ORG / MIL_UNIT) en service web.
 
-Endpoints
-  GET  /health          état du service et du modèle
-  GET  /model/info      version et métriques du modèle (meta.json)
+Routes
+  GET  /health          état du service, du modèle et de la connexion Elasticsearch
+  GET  /model/info      métriques du modèle servi (précision, rappel, F1), lues dans meta.json
   POST /predict         entités d'un article
-  POST /predict/batch   entités de plusieurs articles (max 100)
-  POST /index           prédit puis indexe l'article dans Elasticsearch (si ES_URL défini)
-  GET  /metrics         métriques Prometheus (monitoring)
+  POST /predict/batch   entités de 1 à 100 articles
+  POST /index           analyse l'article puis l'indexe dans Elasticsearch (si ES_URL est défini)
+  GET  /metrics         métriques lues par Prometheus
+  GET  /docs            documentation Swagger (fichiers servis en local)
 
 Lancement local :
   uvicorn api.main:app --host 0.0.0.0 --port 8000

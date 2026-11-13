@@ -156,27 +156,27 @@ Les fichiers de données volumineux (`data_set.json`, `dataset_with_entities.jso
 
 ### Modèle (jeu de validation : 41 articles)
 
-Le pipeline a été exécuté deux fois de bout en bout pour vérifier que le résultat est stable. L'API sert le modèle du second entraînement.
+Le pipeline a été relancé plusieurs fois de bout en bout : le F1 global reste entre 0,79 et 0,81, le résultat est stable. Scores du modèle servi par l'API :
 
-| Label | Entités annotées (200 articles) | F1 — 1er entraînement | F1 — 2e entraînement (modèle servi) |
-|-------|------|------|------|
-| **Global** | 1 103 | 0,794 | **0,804** (précision 0,819 · rappel 0,789) |
-| `MIL_ORG` | 643 | 0,852 | **0,860** |
-| `WEAPON` | 433 | 0,667 | **0,674** |
-| `MIL_UNIT` | 27 | 0,000 | 0,000 ⚠️ (trop peu d'exemples) |
+| Label | Entités annotées (200 articles) | Précision | Rappel | F1 |
+|-------|------|------|------|------|
+| **Global** | 1 103 | 0,825 | 0,795 | **0,810** |
+| `MIL_ORG` | 640 | 0,856 | 0,878 | **0,867** |
+| `WEAPON` | 433 | 0,738 | 0,646 | **0,689** |
+| `MIL_UNIT` | 30 | 0,000 | 0,000 | 0,000 ⚠️ (trop peu d'exemples) |
 
-Un point d'écart entre les deux entraînements n'est pas significatif avec 41 articles de validation : le pipeline est reproductible.
+La CI refait la mesure sur le jeu de référence `data/dev.spacy` et trouve le même F1 global (0,810).
 
-### Index utilisé par le dashboard (premier entraînement)
+### Index utilisé par le dashboard
 
 - **21 742** articles indexés
-- **63 553** entités militaires extraites (≈ 2,9 par article) : MIL_ORG 45 877, WEAPON 17 638, MIL_UNIT 37
-- **87,1 %** des articles contiennent au moins une entité
-- **1 059** formulations d'armes distinctes
-- Armes les plus citées : **cruise missiles** (1 034), **Kalibr** (735), **S-400** (680), **ballistic missiles** (679)
-- Co-occurrences fortes : `Kalibr × Russian Navy` (258), `S-400 × NATO` (244), `ballistic missiles × NATO` (204)
+- **62 809** entités militaires extraites (≈ 2,9 par article) : MIL_ORG 44 901, WEAPON 17 869, MIL_UNIT 36
+- **86,7 %** des articles contiennent au moins une entité
+- **1 111** formulations d'armes distinctes
+- Armes les plus citées : **cruise missiles** (1 040 articles), **Kalibr** (733), **S-400** (680), **ballistic missiles** (679)
+- Co-occurrences fortes : `Kalibr × the Russian Navy` (257), `S-400 × NATO` (244), `ballistic missiles × NATO` (204)
 
-Le second entraînement donne des résultats très proches (≈ 62 500 entités, 86,6 % de couverture, mêmes co-occurrences). Les rapports bruts sont dans [`reports/`](reports/).
+Les rapports bruts sont dans [`reports/`](reports/).
 
 ---
 
@@ -256,7 +256,7 @@ L'API expose ses métriques sur `/metrics`. Prometheus les lit toutes les 5 seco
 |---|---|---|
 | `ApiIndisponible` | l'API ne répond plus pendant 1 min | le service est tombé |
 | `LatenceElevee` | p95 de `/predict` > 1 s pendant 5 min | le service ralentit |
-| `DeriveCouverture` | plus de 25 % d'articles sans entité (mesuré sur 30 min, pendant 15 min) | les articles reçus ne ressemblent plus au corpus (référence : 13,4 %) |
+| `DeriveCouverture` | plus de 25 % d'articles sans entité (mesuré sur 30 min, pendant 15 min) | les articles reçus ne ressemblent plus au corpus (référence : 13,3 %) |
 
 La dernière alerte est propre au NER : un modèle peut répondre vite et sans erreur tout en devenant inutile, par exemple si on lui envoie des articles d'une autre rubrique ou dans une autre langue.
 
@@ -273,7 +273,7 @@ histogram_quantile(0.95, sum(rate(ner_api_request_latency_seconds_bucket{endpoin
 sum(rate(ner_articles_without_entity_total[30m])) / sum(rate(ner_articles_total[30m]))
 ```
 
-Lors d'un test de 3 904 articles : latence p95 ≈ 47 ms, 13,2 % d'articles sans entité, aucune alerte déclenchée.
+Lors d'un test de 4 000 articles (stack lancée avec `docker compose`) : latence moyenne 52 ms, p95 ≈ 155 ms, 12,8 % d'articles sans entité, aucune alerte déclenchée.
 
 ---
 
@@ -302,7 +302,7 @@ Lors d'un test de 3 904 articles : latence p95 ≈ 47 ms, 13,2 % d'articles sans
 
 ## ⚠️ Limites & Améliorations possibles
 
-- **MIL_UNIT n'est pas appris** : 27 exemples annotés seulement. Piste : annoter davantage d'unités, par exemple avec une pré-annotation par LLM relue à la main.
+- **MIL_UNIT n'est pas appris** : 30 exemples annotés seulement. Piste : annoter davantage d'unités, par exemple avec une pré-annotation par LLM relue à la main.
 - **Variantes d'une même entité comptées à part** (« Defense » et « the Russian Defense Ministry »). Piste : ajouter une étape de normalisation (synonymes, coréférence).
 - **Jeu de validation petit** (41 articles) et tiré au hasard par `step3`. Piste : l'agrandir et le figer (liste d'identifiants).
 - **Contrôle de qualité minimal** : seuil absolu de 0,70. Piste : comparer aussi chaque nouveau modèle au modèle en place.

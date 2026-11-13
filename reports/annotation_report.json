@@ -1,9 +1,9 @@
 {
   "articles_annotés": 200,
   "entités_par_label": {
-    "MIL_ORG": 643,
+    "MIL_ORG": 640,
     "WEAPON": 433,
-    "MIL_UNIT": 27
+    "MIL_UNIT": 30
   },
   "total_entités": 1103,
   "moyenne_par_article": 5.51,

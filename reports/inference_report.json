@@ -1,52 +1,52 @@
 {
   "articles_traités": 21465,
-  "entités_extraites": 61397,
-  "filtrées": 4,
+  "entités_extraites": 61706,
+  "filtrées": 3,
   "distribution": {
-    "WEAPON": 17274,
-    "MIL_ORG": 44116,
-    "FAC": 2,
-    "MIL_UNIT": 3,
+    "WEAPON": 17436,
+    "MIL_ORG": 44261,
+    "MIL_UNIT": 6,
     "PERCENT": 1,
-    "MONEY": 1
+    "MONEY": 2
   },
   "top_10_par_label": {
     "WEAPON": {
       "cruise missiles": 1022,
-      "Kalibr": 726,
+      "Kalibr": 723,
       "S-400": 667,
-      "ballistic missiles": 665,
-      "ballistic missile": 554,
-      "anti-aircraft missile": 508,
-      "air defense missile": 455,
-      "HIMARS": 376,
-      "multiple rocket launchers": 365,
+      "ballistic missiles": 664,
+      "ballistic missile": 555,
+      "anti-aircraft missile": 524,
+      "air defense missile": 449,
+      "HIMARS": 372,
+      "multiple rocket launchers": 370,
       "cruise missile": 353
     },
     "MIL_ORG": {
-      "the Russian Defense Ministry": 2588,
-      "Defense": 2258,
+      "the Russian Defense Ministry": 2592,
+      "Defense": 2131,
       "NATO": 1854,
-      "Defense Ministry": 1677,
-      "the Defense Ministry": 1393,
-      "Russian military": 1347,
+      "Defense Ministry": 1668,
+      "the Defense Ministry": 1394,
+      "Russian military": 1349,
       "Russian forces": 1142,
-      "Russian troops": 976,
-      "Navy": 933,
-      "the Russian Armed Forces": 897
-    },
-    "FAC": {
-      "72nd mechanized": 2
+      "Russian troops": 983,
+      "Navy": 930,
+      "Ukrainian army": 895
     },
     "MIL_UNIT": {
-      "5th assault brigade": 2,
-      "5th assault corps": 1
+      "5th assault brigade of the Ukrainian Armed Forces was repelled,\" the Ministry said. Russian troops have hit Ukrainian warehouses with fuel and UAVs, as well as enemy forces and military equipment in 146 districts, the Russian Defense Ministry reported. \"Over the past 24 hours, operational-tactical aviation, unmanned aerial vehicles, missile troops and artillery groups of the Russian Armed Forces hit the following: AN/MPQ-65 radar station of the Patriot anti-aircraft missile system, a fuel depot, a storage depot for unmanned aerial vehicles, as well as station sites of enemy servicemen and military equipment in 146 districts,\" the Ministry said.": 1,
+      "5th Assault Brigade. As a result of active actions, they improved their frontline positions, striking manpower and equipment of Ukraine’s 28th and 54th mechanized brigades near Pereyezdnoye, Verkhnekamenskoye and Konstantinovka,\" Astafyev said. Ukrainian forces sustained roughly 420 casualties, he added. Also, Astafyev continued, Russian artillery and loitering munitions struck an M113 armored personnel carrier, two cars, a counter-battery station and two field ammunition depots. In counterbattery warfare, Russian troops destroyed a towed FH-70 155mm howitzer, an M777 howitzer, four D-20 152mm guns, two D-30 122mm howitzers, two 105mm howitzers and a Rapira gun.": 1,
+      "5th assault brigade of the enemy have been repelled,\" the report said. The Ukrainian army lost up to 450 troops, two US-made M113 armored fighting vehicles, a US-produced HMMWV armored combat vehicle and nine cars in 24 hours, the ministry said. Moreover, US-manufactured 155mm М109 Paladin and Poland-made Krab self-propelled artillery systems, a US-made 155mm M777 howitzer, three 152mm D-20 weapons, three US-produced 105mm M119 weapons were destroyed, as well as an Anklav electronic warfare station, a US-produced AN/TPQ-50 counterbattery radar station and six ammunition depots. Russia’s Battlegroup Center repelled six counterattacks in the Donetsk People’s Republic in 24 hours, the Russian Defense Ministry reported. \"Units of Battlegroup Center improved its tactical position, inflicted damage on units of the 47th, 59th, 110th mechanized, 57th infantry brigades of the Ukrainian army and the 109th territorial defense brigade near the settlements of Novgorodskoye, Rozovka, Lozovatskoye, Tarasovka, Novoselovka Pervaya and Toretsk of the Donetsk People’s Republic. In 24 hours, six attacks by units of the Lyut assault brigade, the 31st, 32nd, 151th mechanized, 68th jaeger brigades and a separate 425th assault battalion of the Ukrainian army were repelled,\" the ministry said. The enemy lost up to 300 troops, three armored combat vehicles, eight cars, a US-made 155mm M777 howitzer, two 152mm Msta-B howitzers, two 122mm D-30 howitzers, three US-produced 105mm M119 weapons, as well as a 122m Grad multiple-launch rocket system, the report said. Ukraine’s armed forces lost up to 155 troops and several artillery weapons in the area of Russia’s Battlegroup East in 24 hours, the Russian Defense Ministry reported. \"Damage was inflicted on troops and equipment of the 72nd mechanized, 58th infantry, 1st tank brigades of the Ukrainian army and the 128th territorial defense brigade near the settlements of Vodyanoye, Prechistovka, Velikaya Novoselka and Makarovka of the Donetsk People’s Republic. Two counterattacks by assault units of the 123rd territorial defense brigade were repelled. The Ukrainian army lost up to 155 troops, four cars, a US-produced 155mm M777howitzer, five UK-made 155mm FH-70 howitzers, a 152mm D-20 weapon,\" the report said. Russia’s Battlegroup Dnepr has eliminated an Israel-made RADA RPS-42 radar and four field ammunition depots, the Russian Defense Ministry reported. \"The Ukrainian army’s losses equaled up to 70 troops, four cars, US-made 155mm M777 and M198 howitzers, a 152mm D-20 weapon. Moreover, a Plastun electronic warfare station, an Israel-made RADA RPS-42 radar and four ammunition depots were destroyed in 24 hours,\" the report said. Units of Battlegroup Dnepr inflicted damage on troops and equipment of the 65th mechanized, 128th mountain assault brigades of the Ukrainian army, the 35th marine brigade and 23rd national guard brigades near the settlements of Tokarevka of the Kherson Region, Novokamenka of the Dnepropetrovsk Region, Nestryanka, Pyatikhatki, as well as to the north of Rabotino of the Zaporozhye Region, the ministry added.": 1,
+      "5th assault brigade of the Ukrainian army near Bogdanovka and Kleshcheyevka, the ministry said, adding that Ukrainian manpower and equipment were defeated in the area of the settlements of Veseloye, Nikolayevka, Krasnoye, Kurdyumovka and Vasyukovka of the Donetsk People’s Republic.": 1,
+      "special operations troops arrived in Pakistan to participate in the Friendship 2020 drills, the press office of Russia’s Southern Military District reported on Thursday. \"The personnel of the Southern Military District arrived in the Islamic Republic of Pakistan aboard an Il-76 military transport plane for participating in the Friendship 2020 joint Russian-Pakistani drills. The international drills involve over 70 servicemen of the special operations company of the Southern Military District’s 49th combined arms army, and also officers of the command headquarters,\" the press office said in a statement. The drills will run at the Pakistani Army’s Tarbela special operations training ground and on the territory of the National Counterterrorism Center in Pabbi. The personnel from both countries will exchange experience and practice inter-operability in accomplishing a broad range of missions, in particular, eliminating illegal armed formations and conducting reconnaissance and search measures employing aircraft and technical reconnaissance capabilities, the statement says. Friendship joint Russian-Pakistani military drills have been held annually since 2016 alternately in each of the countries, the press office specified.": 1,
+      "5th assault corps advancing from Palmyra through Es Sukhne entered the city from the southern direction,\" he emphasized.": 1
     },
     "PERCENT": {
       "71.6%": 1
     },
     "MONEY": {
-      "1.67 trillion rubles": 1
+      "1.67 trillion rubles": 2
     }
   }
 }

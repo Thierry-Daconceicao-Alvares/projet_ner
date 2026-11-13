@@ -1,20 +1,19 @@
 {
   "articles_totaux": 21742,
-  "articles_avec_entités": 18827,
-  "couverture_pct": 86.6,
+  "articles_avec_entités": 18851,
+  "couverture_pct": 86.7,
   "entités_par_label": {
-    "WEAPON": 17707,
-    "MIL_ORG": 44759,
-    "MIL_UNIT": 30,
-    "FAC": 2,
+    "WEAPON": 17869,
+    "MIL_ORG": 44901,
+    "MIL_UNIT": 36,
     "PERCENT": 1,
-    "MONEY": 1
+    "MONEY": 2
   },
   "top_10_cooccurrences_weapon_org": [
     {
       "weapon": "Kalibr",
       "org": "the Russian Navy",
-      "count": 258
+      "count": 257
     },
     {
       "weapon": "S-400",
@@ -29,7 +28,7 @@
     {
       "weapon": "Kalibr",
       "org": "Navy",
-      "count": 194
+      "count": 192
     },
     {
       "weapon": "cruise missiles",
@@ -59,7 +58,7 @@
     {
       "weapon": "cruise missiles",
       "org": "Defense",
-      "count": 138
+      "count": 127
     }
   ]
 }
